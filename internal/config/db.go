@@ -9,13 +9,13 @@ import (
 //	DSN() string
 //}
 
-type DBConfig struct {
+type DB struct {
 	dsn string
 }
 
 func (c *Config) LoadDbConfig(fErr *errEnvVariableNotFound) {
 	const op = "Config.LoadDbConfig"
-	cfg := &DBConfig{}
+	cfg := &DB{}
 
 	if value, ok := os.LookupEnv("DB_URL"); ok {
 		cfg.dsn = value
@@ -23,9 +23,9 @@ func (c *Config) LoadDbConfig(fErr *errEnvVariableNotFound) {
 		fErr.Add(fmt.Errorf("%s: env variable 'DB_URL' is not set", op))
 	}
 
-	c.DBConfig = cfg
+	c.DB = cfg
 }
 
-func (cfg *DBConfig) DSN() string {
+func (cfg *DB) DSN() string {
 	return cfg.dsn
 }

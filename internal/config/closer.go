@@ -6,23 +6,23 @@ import (
 	"time"
 )
 
-type CloserConfig struct {
+type Closer struct {
 	totalDuration time.Duration
 	funcDuration  time.Duration
 }
 
-func (c *CloserConfig) TotalDuration() time.Duration {
+func (c *Closer) TotalDuration() time.Duration {
 	return c.totalDuration
 }
 
-func (c *CloserConfig) FuncDuration() time.Duration {
+func (c *Closer) FuncDuration() time.Duration {
 	return c.funcDuration
 }
 
 func (c *Config) LoadCloserConfig(fErr *errEnvVariableNotFound) {
 	const op = "Config.LoadCloserConfig"
 
-	var cfg = &CloserConfig{}
+	var cfg = &Closer{}
 	if env, ok := os.LookupEnv("CLOSER_TOTAL_DURATION"); ok {
 		t, err := time.ParseDuration(env)
 		if err != nil {
@@ -45,5 +45,5 @@ func (c *Config) LoadCloserConfig(fErr *errEnvVariableNotFound) {
 		//fErr.Add(fmt.Errorf("%s: env variable 'CLOSER_FUNC_DURATION' is not set", op))
 	}
 
-	c.CloserConfig = cfg
+	c.Closer = cfg
 }

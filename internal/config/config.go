@@ -4,9 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/goloop/env"
 	"os"
 	"strings"
+
+	"github.com/goloop/env"
 )
 
 type errEnvVariableNotFound struct {
@@ -33,10 +34,10 @@ func (e *errEnvVariableNotFound) Add(err error) {
 
 // Config struct
 type Config struct {
-	DBConfig       *DBConfig
-	CloserConfig   *CloserConfig
+	DB             *DB
+	Closer         *Closer
 	HttpServer     *HttpServer
-	GrpcAuthServer *GRPCServerConfig
+	GrpcAuthServer *GRPCAuthServer
 }
 
 func (c *Config) Close(ctx context.Context) error {
@@ -58,7 +59,6 @@ func New() (*Config, error) {
 	cfg.LoadDbConfig(envErrs)
 
 	cfg.LoadCloserConfig(envErrs)
-
 	cfg.LoadHttpServerConfig(envErrs)
 
 	if envErrs.Variables != nil {

@@ -3,6 +3,7 @@ package provider
 import (
 	"context"
 	"fmt"
+
 	"github.com/ttrtcixy/workout/internal/app/closer"
 	"github.com/ttrtcixy/workout/internal/config"
 	"github.com/ttrtcixy/workout/internal/core/repository"
@@ -113,8 +114,8 @@ func (p *Provider) initConfig() error {
 func (p *Provider) initCloser(ctx context.Context) error {
 	const op = "Provider.initCloser"
 	p.closer = closer.New(closer.Config{
-		TotalDuration: p.cfg.CloserConfig.TotalDuration(),
-		FuncDuration:  p.cfg.CloserConfig.FuncDuration(),
+		TotalDuration: p.cfg.Closer.TotalDuration(),
+		FuncDuration:  p.cfg.Closer.FuncDuration(),
 		Logger:        p.logger,
 	})
 
@@ -124,7 +125,7 @@ func (p *Provider) initCloser(ctx context.Context) error {
 
 func (p *Provider) initDB(ctx context.Context) error {
 	const op = "Provider.initDB"
-	db, err := storage.New(ctx, p.logger, p.cfg.DBConfig)
+	db, err := storage.New(ctx, p.logger, p.cfg.DB)
 	if err != nil {
 		return fmt.Errorf("op: %s - db init failed: %w", op, err)
 	}

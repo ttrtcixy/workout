@@ -3,6 +3,7 @@ package storage
 import (
 	"context"
 	"fmt"
+
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ttrtcixy/workout/internal/config"
@@ -14,7 +15,7 @@ type contextKey string
 var txCtxKey = contextKey("tx")
 
 type db struct {
-	cfg  *config.DBConfig
+	cfg  *config.DB
 	pool *pgxpool.Pool
 	log  logger.Logger
 }
@@ -103,7 +104,7 @@ func (db *db) QueryRow(ctx context.Context, query Query) Row {
 	return db.pool.QueryRow(ctx, query.Query(), query.Args()...)
 }
 
-func New(ctx context.Context, log logger.Logger, cfg *config.DBConfig) (DB, error) {
+func New(ctx context.Context, log logger.Logger, cfg *config.DB) (DB, error) {
 	const op = "storage.New"
 	pool, err := pgxpool.New(ctx, cfg.DSN())
 	if err != nil {
