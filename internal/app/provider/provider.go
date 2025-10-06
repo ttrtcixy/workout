@@ -33,21 +33,21 @@ type Provider struct {
 	httpServer *http.Server
 }
 
-func NewProvider(ctx context.Context) (p *Provider, err error) {
-	const op = "Provider.NewProvider"
+func New(ctx context.Context) (p *Provider, err error) {
+	const op = "Provider.New"
 
 	p = &Provider{}
 
-	if err := p.initLogger(); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initLogger(); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 
-	if err := p.initConfig(); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initConfig(); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 
-	if err := p.initCloser(ctx); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initCloser(ctx); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 
 	defer func() {
@@ -61,32 +61,32 @@ func NewProvider(ctx context.Context) (p *Provider, err error) {
 		p.cfg.Close,
 	)
 
-	if err := p.initDB(ctx); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initDB(ctx); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 
-	if err := p.initServices(); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initServices(); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 
-	if err := p.initAuthClient(ctx); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initAuthClient(ctx); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 
-	if err := p.initRepository(ctx); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initRepository(ctx); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 
-	if err := p.initUseCase(ctx); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initUseCase(ctx); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 
-	if err := p.initHandler(ctx); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initHandler(ctx); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 
-	if err := p.initHTTPServer(ctx); err != nil {
-		return nil, apperrors.Wrap(op, err)
+	if err = p.initHTTPServer(ctx); err != nil {
+		return p, apperrors.Wrap(op, err)
 	}
 	p.closer.Add("stop http server", p.httpServer.Close)
 
@@ -103,7 +103,7 @@ func (p *Provider) initConfig() error {
 	const op = "Provider.initConfig"
 	cfg, err := config.New()
 	if err != nil {
-		return fmt.Errorf("[-] op: %s - config init failed: %w", op, err)
+		return fmt.Errorf("op: %s - config init failed: %w", op, err)
 	}
 
 	p.cfg = cfg
