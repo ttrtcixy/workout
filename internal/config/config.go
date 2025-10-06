@@ -57,12 +57,14 @@ func New() (*Config, error) {
 	var envErrs = &errEnvVariableNotFound{}
 
 	cfg.LoadDbConfig(envErrs)
-
 	cfg.LoadCloserConfig(envErrs)
 	cfg.LoadHttpServerConfig(envErrs)
+	cfg.LoadGRPCConfig(envErrs)
 
 	if envErrs.Variables != nil {
-		return nil, envErrs
+		if len(envErrs.Variables) > 0 {
+			return nil, envErrs
+		}
 	}
 
 	return cfg, nil
