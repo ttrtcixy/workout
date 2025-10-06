@@ -3,10 +3,11 @@ package app
 import (
 	"context"
 	"errors"
-	"github.com/ttrtcixy/workout/internal/app/provider"
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/ttrtcixy/workout/internal/app/provider"
 )
 
 type App struct {
@@ -17,7 +18,7 @@ type App struct {
 func NewApp(ctx context.Context) *App {
 	const op = "App.NewApp"
 
-	p, err := provider.NewProvider(ctx)
+	p, err := provider.New(ctx)
 	if err != nil {
 		log.Fatalf("%s: error initializing provider: %s", op, err.Error())
 	}
@@ -28,7 +29,7 @@ func NewApp(ctx context.Context) *App {
 
 func (a *App) Run(ctx context.Context) {
 	defer a.Closer().Close()
-	
+
 	a.wg.Add(1)
 	go func() {
 		defer a.wg.Done()
