@@ -164,8 +164,6 @@ func (c *closer) Close() {
 		}
 		c.log.Info("[+] closer finished, all tasks closed, total duration: " + time.Since(timer).String())
 	}
-
-	os.Exit(0)
 }
 
 func (c *closer) closeWithTimeout(globalCtx context.Context, t task) error {
