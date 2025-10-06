@@ -20,6 +20,33 @@ type db struct {
 	log  logger.Logger
 }
 
+func New(ctx context.Context, log logger.Logger, cfg *config.DB) (DB, error) {
+	const op = "storage.New"
+
+	poolCfg, err := pgxpool.ParseConfig(cfg.DSN())
+	if err != nil {
+		return nil, err
+	}
+
+	poolCfg.ConnConfig.ConnectTimeout = cfg.ConnectTimeout()
+
+	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
+	if err != nil {
+		return nil, fmt.Errorf("op: %s, error connect to database: %s", op, err.Error())
+	}
+	storage := &db{
+		cfg:  cfg,
+		pool: pool,
+		log:  log,
+	}
+
+	if err := storage.pool.Ping(ctx); err != nil {
+		return nil, fmt.Errorf("op: %s, error connect to database: %s", op, err.Error())
+	}
+
+	return storage, nil
+}
+
 // todo check
 func (db *db) RunInTx(ctx context.Context, fn func(context.Context) error) (err error) {
 	// будут ли проблемы из-за того что не указатель на транзакцию
@@ -102,25 +129,6 @@ func (db *db) QueryRow(ctx context.Context, query Query) Row {
 	}
 
 	return db.pool.QueryRow(ctx, query.Query(), query.Args()...)
-}
-
-func New(ctx context.Context, log logger.Logger, cfg *config.DB) (DB, error) {
-	const op = "storage.New"
-	pool, err := pgxpool.New(ctx, cfg.DSN())
-	if err != nil {
-		return nil, fmt.Errorf("op: %s, error connect to database: %s", op, err.Error())
-	}
-	storage := &db{
-		cfg:  cfg,
-		pool: pool,
-		log:  log,
-	}
-
-	if err := storage.pool.Ping(ctx); err != nil {
-		return nil, fmt.Errorf("op: %s, error connect to database: %s", op, err.Error())
-	}
-
-	return storage, nil
 }
 
 func (db *db) logQuery(query Query) {
