@@ -20,7 +20,7 @@ type GRPCAuthServer struct {
 
 func (c *Config) LoadGRPCConfig(fErr *errEnvVariableNotFound) {
 	const op = "Config.LoadGRPCConfig"
-	cfg := &GRPCAuthServer{}
+	var cfg = &GRPCAuthServer{}
 
 	if value, ok := os.LookupEnv("GRPC_HOST"); ok {
 		cfg.host = value

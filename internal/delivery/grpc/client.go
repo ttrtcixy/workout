@@ -3,6 +3,10 @@ package grpc
 import (
 	"context"
 	"errors"
+	"sync"
+	"sync/atomic"
+	"time"
+
 	"github.com/ttrtcixy/users-protos/gen/go/users"
 	"github.com/ttrtcixy/workout/internal/config"
 	apperrors "github.com/ttrtcixy/workout/internal/errors"
@@ -12,9 +16,6 @@ import (
 	"google.golang.org/grpc/connectivity"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/keepalive"
-	"sync"
-	"sync/atomic"
-	"time"
 )
 
 type AuthClient struct {
@@ -89,6 +90,7 @@ func (a *AuthClient) connect() (err error) {
 		}`),
 	}
 
+	// todo add ping
 	if a.conn, err = grpc.NewClient(a.cfg.Addr(), opts...); err != nil {
 		return apperrors.Wrap(op, err)
 	}

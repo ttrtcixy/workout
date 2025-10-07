@@ -20,6 +20,7 @@ type db struct {
 	log  logger.Logger
 }
 
+// todo refactor
 func New(ctx context.Context, log logger.Logger, cfg *config.DB) (DB, error) {
 	const op = "storage.New"
 
@@ -29,7 +30,6 @@ func New(ctx context.Context, log logger.Logger, cfg *config.DB) (DB, error) {
 	}
 
 	poolCfg.ConnConfig.ConnectTimeout = cfg.ConnectTimeout()
-
 	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
 	if err != nil {
 		return nil, fmt.Errorf("op: %s, error connect to database: %s", op, err.Error())
@@ -41,6 +41,7 @@ func New(ctx context.Context, log logger.Logger, cfg *config.DB) (DB, error) {
 	}
 
 	if err := storage.pool.Ping(ctx); err != nil {
+		pool.Close()
 		return nil, fmt.Errorf("op: %s, error connect to database: %s", op, err.Error())
 	}
 
