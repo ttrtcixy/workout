@@ -11,8 +11,9 @@ import (
 //}
 
 type DB struct {
-	dsn            string
-	connectTimeout time.Duration
+	dsn                  string
+	connectTimeout       time.Duration
+	maxReconnectsAttempt int
 }
 
 func (c *Config) LoadDbConfig(fErr *errEnvVariableNotFound) {

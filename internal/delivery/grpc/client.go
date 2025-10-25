@@ -37,7 +37,7 @@ type AuthClientRequest struct {
 }
 
 func NewAuthClient(log logger.Logger, cfg *config.GRPCAuthServer) (*AuthClient, error) {
-	const op = "NewAuthClient"
+	const op = "grpc.NewAuthClient"
 	client := &AuthClient{
 		log: log,
 		cfg: cfg,

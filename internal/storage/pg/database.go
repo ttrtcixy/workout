@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/ttrtcixy/workout/internal/config"
+	apperrors "github.com/ttrtcixy/workout/internal/errors"
 	"github.com/ttrtcixy/workout/internal/logger"
 )
 
@@ -20,32 +21,48 @@ type db struct {
 	log  logger.Logger
 }
 
-// todo refactor
 func New(ctx context.Context, log logger.Logger, cfg *config.DB) (DB, error) {
 	const op = "storage.New"
+	var storage = &db{
+		cfg: cfg,
+		log: log,
+	}
 
-	poolCfg, err := pgxpool.ParseConfig(cfg.DSN())
-	if err != nil {
+	if err := storage.createPool(ctx); err != nil {
+		return nil, fmt.Errorf("op: %s, error pool creation: %s", op, err)
+	}
+
+	if err := storage.ping(ctx); err != nil {
 		return nil, err
 	}
 
-	poolCfg.ConnConfig.ConnectTimeout = cfg.ConnectTimeout()
-	pool, err := pgxpool.NewWithConfig(ctx, poolCfg)
-	if err != nil {
-		return nil, fmt.Errorf("op: %s, error connect to database: %s", op, err.Error())
-	}
-	storage := &db{
-		cfg:  cfg,
-		pool: pool,
-		log:  log,
-	}
-
-	if err := storage.pool.Ping(ctx); err != nil {
-		pool.Close()
-		return nil, fmt.Errorf("op: %s, error connect to database: %s", op, err.Error())
-	}
-
 	return storage, nil
+}
+
+// createPool init database connection, but not connect
+func (db *db) createPool(ctx context.Context) (err error) {
+	const op = "db.createPool"
+	poolCfg, err := pgxpool.ParseConfig(db.cfg.DSN())
+	if err != nil {
+		return apperrors.Wrap(op, err)
+	}
+
+	poolCfg.ConnConfig.ConnectTimeout = db.cfg.ConnectTimeout()
+
+	db.pool, err = pgxpool.NewWithConfig(ctx, poolCfg)
+	if err != nil {
+		return apperrors.Wrap(op, err)
+	}
+	return nil
+}
+
+func (db *db) ping(ctx context.Context) error {
+	const op = "db.ping"
+	if err := db.pool.Ping(ctx); err != nil {
+		db.pool.Close()
+		return fmt.Errorf("op: %s, error connect to database: %s", op, err.Error())
+	}
+	return nil
 }
 
 // todo check

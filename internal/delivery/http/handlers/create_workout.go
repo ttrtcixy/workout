@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"errors"
+	"net/http"
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/ttrtcixy/workout/internal/core/entities"
 	"github.com/ttrtcixy/workout/internal/delivery/http/dtos"
 	"github.com/ttrtcixy/workout/internal/delivery/ports"
 	"github.com/ttrtcixy/workout/internal/logger"
-	"net/http"
-	"time"
 )
 
 type CreateWorkout struct {

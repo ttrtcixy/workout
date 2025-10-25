@@ -2,8 +2,11 @@ package workoutusecase
 
 import (
 	"context"
+	"errors"
+
 	"github.com/ttrtcixy/workout/internal/core/entities"
 	"github.com/ttrtcixy/workout/internal/core/usecase/ports"
+	apperrors "github.com/ttrtcixy/workout/internal/errors"
 	"github.com/ttrtcixy/workout/internal/logger"
 )
 
@@ -16,8 +19,17 @@ func NewCreateWorkout(log logger.Logger, repo ports.CreateWorkoutRepository) *Cr
 	return &CreateWorkoutUsecase{log: log, repo: repo}
 }
 
-func (u *CreateWorkoutUsecase) CreateWorkout(ctx context.Context, payload *entities.CreateWorkoutRequest) (*entities.CreateWorkoutResponse, error) {
-	err := u.repo.CreateWorkout(ctx, payload)
+func (u *CreateWorkoutUsecase) CreateWorkout(ctx context.Context, payload *entities.CreateWorkoutRequest) (response *entities.CreateWorkoutResponse, err error) {
+	defer func() {
+		if err != nil {
+			var userErr apperrors.UserError
+			if errors.As(err, &userErr) {
+				return
+			}
+			
+		}
+	}()
+	err = u.repo.CreateWorkout(ctx, payload)
 	if err != nil {
 		return nil, err
 	}
